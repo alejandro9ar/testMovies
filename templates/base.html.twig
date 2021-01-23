@@ -1,13 +1,24 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+{% extends 'base_general.html.twig' %}
 
-        {% block javascripts %}{% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
-</html>
+{% block stylesheet_general %}
+    {% block stylesheet %}
+
+    {% endblock %}
+{% endblock %}
+
+{% block body_general %}
+<body id="page-top">
+    {% include 'header.html.twig' %}
+
+        {% block body %}
+        {% endblock %}
+
+    {% include 'footer.html.twig' %}
+</body>
+{% endblock %}
+
+{% block javascript_general %}
+    {% block javascript %}
+
+    {% endblock %}
+{% endblock %}
