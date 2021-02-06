@@ -36,8 +36,8 @@ class CharacterRepository extends ServiceEntityRepository
     public function listByName($name)
     {
         return $this->createQueryBuilder('character')
-            ->andWhere('character.name = :name')
-            ->setParameter('%name%', $name)
+            ->andWhere('character.name LIKE :name')
+            ->setParameter('name', '%' . $name . '%')
             ->getQuery()->execute()
             ;
     }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Character;
+use App\Form\CharacterFilterType;
 use App\Form\CharacterType;
 use App\Form\FileUploadType;
 use App\Repository\CharacterRepository;
@@ -13,9 +14,11 @@ use Knp\Component\Pager\PaginatorInterface;
 use PhpParser\Node\Name;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Json;
 
 /**
  * @Route("/character")
@@ -23,15 +26,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class CharacterController extends AbstractController
 {
     /**
-     * @Route("/", name="character_index", methods={"GET"})
+     * @Route("/", name="character_index")
      */
-    public function index(PaginatorInterface $paginator, Request $request, CharacterRepository $characterRepository): Response
+    public function index(PaginatorInterface $paginator, Request $request)
     {
-        $session = $this->get('session');
-        if (isset($session['characterFilter'])) {
+
+        return $this->render('character/index.html.twig');
+    }
+
+    /**
+     * @Route("/list", name="character_list")
+     */
+    public function list(PaginatorInterface $paginator, Request $request)
+    {
+        $sessionVariable = $this->get('session')->get('characterFilter');
+        if (isset($sessionVariable)) {
             $characters = $this->getDoctrine()
                 ->getRepository(Character::class)
-                ->listByName($session['characterFilter']);
+                ->listByName($sessionVariable);
         } else {
             $characters = $this->getDoctrine()
                 ->getRepository(Character::class)
@@ -40,13 +52,13 @@ class CharacterController extends AbstractController
         $pagination = $paginator->paginate(
             $characters, $request->query->getInt('page', 1), 10);
 
-        return $this->render('character/index.html.twig', [
+        return $this->render('character/list.html.twig', [
             'characters' => $pagination
         ]);
     }
 
     /**
-     * @Route("/new", name="character_new", methods={"GET","POST"})
+     * @Route("/new", name="character_new")
      */
     public function new(Request $request): Response
     {
@@ -82,7 +94,7 @@ class CharacterController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="character_show", methods={"GET"})
+     * @Route("/{id}", name="character_show", requirements={"id"="\d+"})
      */
     public function show(Character $character): Response
     {
@@ -92,7 +104,7 @@ class CharacterController extends AbstractController
     }
 
     /**
-     * @Route("/edit/{id}", name="character_edit", methods={"GET","POST"})
+     * @Route("/edit/{id}", name="character_edit", requirements={"id"="\d+"})
      */
     public function edit(Request $request, Character $character): Response
     {
@@ -127,7 +139,7 @@ class CharacterController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{id}", name="character_delete", methods={"DELETE"})
+     * @Route("/delete/{id}", name="character_delete", methods={"DELETE"}, requirements={"id"="\d+"})
      */
     public function delete(Request $request, Character $character): Response
     {
@@ -177,37 +189,36 @@ class CharacterController extends AbstractController
         ]);
     }
 
-//    /**
-//     * @Route("/uploadNewImage/{id}", name="character_uploadnewimage", requirements={"id"="\d+"})
-//     */
-//    public function filter(Request $request, $id)
-//    {
-//        $form = $this->createForm(Name::class);
-//
-//        $form->handleRequest($request);
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $formData = $form->getData();
-//            $this->get('session')->set('characterFilter', $formData['name'])
-//
-//            return $this->redirectToRoute('character_index');
-//        }
-//
-//        return $this->render('character/render.html.twig', [
-//            'character' => $character,
-//            'form' => $form->createView(),
-//        ]);
-//    }
-//
-//    /**
-//     * @Route("/clearfilter", name="character_clearfilter")
-//     */
-//    public function clearFilter(Request $request)
-//    {
-//        $this->get('session')->remove('characterFilter');
-//
-//        return $this->render('character/render.html.twig', [
-//            'character' => $character,
-//            'form' => $form->createView(),
-//        ]);
-//    }
+    /**
+     * @Route("/filter", name="character_filter")
+     */
+    public function filter(Request $request)
+    {
+        $sessionVariable = '';
+        if ($this->get('session')->get('characterFilter')) {
+            $sessionVariable = $this->get('session')->get('characterFilter');
+        }
+        $form = $this->createForm(CharacterFilterType::class, ['name' => $sessionVariable]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $formData = $form->getData();
+            $this->get('session')->set('characterFilter', $formData['name']);
+
+            return $this->render('character/index.html.twig');
+        }
+
+        return $this->render('character/filter.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/clearfilter", name="character_clearfilter")
+     */
+    public function clearFilter(Request $request)
+    {
+        $this->get('session')->remove('characterFilter');
+
+        return $this->render('character/index.html.twig');    }
 }
