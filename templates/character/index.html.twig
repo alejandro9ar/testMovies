@@ -7,6 +7,6 @@
         {{ render(controller('App\\Controller\\CharacterController::filter')) }}
 {#    </div>#}
 {#    <div class="load-ajax" data-url="{{ path('character_list') }}">#}
-        {{ render(controller('App\\Controller\\CharacterController::list')) }}
+        {{ render(controller('App\\Controller\\CharacterController::list',{page: page})) }}
 {#    </div>#}
 {% endblock %}

@@ -31,7 +31,9 @@ class CharacterController extends AbstractController
     public function index(PaginatorInterface $paginator, Request $request)
     {
 
-        return $this->render('character/index.html.twig');
+        return $this->render('character/index.html.twig',[
+            'page' => $request->get('page') ? $request->get('page') : 1
+        ]);
     }
 
     /**
@@ -39,18 +41,22 @@ class CharacterController extends AbstractController
      */
     public function list(PaginatorInterface $paginator, Request $request)
     {
-        $sessionVariable = $this->get('session')->get('characterFilter');
-        if (isset($sessionVariable)) {
+        $page = 1;
+        if($request->get('page') != null){
+            $page = $request->get('page');
+        }
+        if($this->get('session')->get('characterFilter')) {
             $characters = $this->getDoctrine()
                 ->getRepository(Character::class)
-                ->listByName($sessionVariable);
+                ->listByName($this->get('session')->get('characterFilter'));
         } else {
             $characters = $this->getDoctrine()
                 ->getRepository(Character::class)
                 ->findAll();
         }
+
         $pagination = $paginator->paginate(
-            $characters, $request->query->getInt('page', 1), 10);
+            $characters, $page, 10);
 
         return $this->render('character/list.html.twig', [
             'characters' => $pagination
@@ -104,7 +110,7 @@ class CharacterController extends AbstractController
     }
 
     /**
-     * @Route("/edit/{id}", name="character_edit", requirements={"id"="\d+"})
+     * @Route("/edit/{id}", name="character_edit")
      */
     public function edit(Request $request, Character $character): Response
     {
@@ -114,22 +120,11 @@ class CharacterController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
 
-            // Recogemos el fichero
-            $file = $form->get('picture')->getViewData();
-            // Sacamos la extensión del fichero
-            $ext = $file->getClientOriginalExtension();
-            // Le ponemos un nombre al fichero
-            $filename = strtr($formData->getName(), " ", "_"). date_timestamp_get(new \DateTime()) . '.' . $ext;
-            // Cogemos el Path desde services.yml parameter
-            $filepath = $this->getParameter('brochures_directory');
-            // Movemos el arhcivo al path que hemos definido
-            $file->move($filepath, $filename);
-
-            $character->setPicture($filename);
-
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('character_index');
+            return $this->redirectToRoute('character_show', [
+                'id' => $character->getId(),
+            ]);
         }
 
         return $this->render('character/edit.html.twig', [
@@ -139,7 +134,7 @@ class CharacterController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{id}", name="character_delete", methods={"DELETE"}, requirements={"id"="\d+"})
+     * @Route("/delete/{id}", name="character_delete", methods={"DELETE"})
      */
     public function delete(Request $request, Character $character): Response
     {
@@ -205,7 +200,9 @@ class CharacterController extends AbstractController
             $formData = $form->getData();
             $this->get('session')->set('characterFilter', $formData['name']);
 
-            return $this->render('character/index.html.twig');
+            return $this->redirectToRoute('character_index', [
+                'page' => 1
+            ]);
         }
 
         return $this->render('character/filter.html.twig', [
@@ -220,5 +217,8 @@ class CharacterController extends AbstractController
     {
         $this->get('session')->remove('characterFilter');
 
-        return $this->render('character/index.html.twig');    }
+        return $this->redirectToRoute('character_index', [
+            'page' => 1
+        ]);
+    }
 }
