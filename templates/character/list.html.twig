@@ -1,0 +1,38 @@
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Mass</th>
+                <th>Height</th>
+                <th>Gender</th>
+                <th>Picture</th>
+                <th><a class="btn btn-outline-info" href="{{ path('character_new') }}"><i class="fa fa-plus"></i> Create new</a></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for character in characters %}
+            <tr>
+                <td>{{ character.name }}</td>
+                <td>{{ character.mass }}</td>
+                <td>{{ character.height }}</td>
+                <td>{{ character.gender }}</td>
+                <td>
+                    {% if character.picture != null %}
+                        <img src="{{ asset('documents/'~ character.picture) }}" style="max-height: 100px;max-width: 100px"></img></td>
+                    {% endif %}
+                <td>
+                    <a class="btn btn-primary" href="{{ path('character_show', {'id': character.id}) }}"><i class="fa fa-eye"></i> Show</a>
+                    <a class="btn btn-success" href="{{ path('character_edit', {'id': character.id}) }}"><i class="fa fa-edit"></i> Edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="navigation">
+        {{ knp_pagination_render(characters) }}
+    </div>

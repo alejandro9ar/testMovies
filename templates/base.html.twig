@@ -7,12 +7,12 @@
 {% endblock %}
 
 {% block body_general %}
-<body id="page-top">
+<body id="page-top" style="margin-top: 150px">
     {% include 'header.html.twig' %}
-
+    <div class="container d-flex align-items-center flex-column">
         {% block body %}
         {% endblock %}
-
+    </div>
     {% include 'footer.html.twig' %}
 </body>
 {% endblock %}

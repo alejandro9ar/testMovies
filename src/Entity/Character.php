@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CharacterRepository::class)
+ * @ORM\Table(name="`character`")
  */
 class Character
 {
@@ -25,7 +26,7 @@ class Character
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     private $mass;
 
@@ -40,18 +41,18 @@ class Character
     private $gender;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="string", length=2048, nullable=true)
      */
     private $picture;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Movie::class, inversedBy="character")
+     * @ORM\ManyToMany(targetEntity=Movie::class, inversedBy="characters")
      */
-    private $movies;
+    private $movie;
 
     public function __construct()
     {
-        $this->movies = new ArrayCollection();
+        $this->movie = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,7 +77,7 @@ class Character
         return $this->mass;
     }
 
-    public function setMass(?string $mass): self
+    public function setMass(string $mass): self
     {
         $this->mass = $mass;
 
@@ -122,15 +123,15 @@ class Character
     /**
      * @return Collection|Movie[]
      */
-    public function getMovies(): Collection
+    public function getMovie(): Collection
     {
-        return $this->movies;
+        return $this->movie;
     }
 
     public function addMovie(Movie $movie): self
     {
-        if (!$this->movies->contains($movie)) {
-            $this->movies[] = $movie;
+        if (!$this->movie->contains($movie)) {
+            $this->movie[] = $movie;
         }
 
         return $this;
@@ -138,7 +139,7 @@ class Character
 
     public function removeMovie(Movie $movie): self
     {
-        $this->movies->removeElement($movie);
+        $this->movie->removeElement($movie);
 
         return $this;
     }

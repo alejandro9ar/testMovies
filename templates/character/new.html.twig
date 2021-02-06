@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Character{% endblock %}
+
+{% block body %}
+    <h1>Create new Character</h1>
+    {% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+
+    <button class="btn btn-info" type="submit"><i class="fa fa-upload"></i>Upload</button>
+    <a class="btn btn-warning" href="{{ path('character_index') }}"><i class="fa fa-long-arrow-left"></i> Back to list</a>
+
+    {{ form_end(form) }}
+    <div class="mb-4"></div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $( document ).ready(function() {
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    });
+</script>
+{% endblock %}

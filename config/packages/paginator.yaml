@@ -1,0 +1,10 @@
+knp_paginator:
+  page_range: 5                      # rango usado por dafault en la paginación
+  default_options:
+    page_name: page                # nombre para cada sección de consulta
+    sort_field_name: sort          # nombre del parámetro de consulta
+    sort_direction_name: direction # dirección del nombre del parámetro
+    distinct: true                 # garantiza resultados distintos
+  template:
+    pagination: 'pagination_template.html.twig'     # sliding pagination controls template
+    sortable: 'KnpPaginatorBundle:Pagination:sortable_link.html.twig'                         # sort link template

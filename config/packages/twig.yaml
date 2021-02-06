@@ -1,2 +1,4 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+    globals:
+        brochures_directory: '%env(PATH_DOCUMENTS)%'

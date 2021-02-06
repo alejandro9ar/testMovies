@@ -25,13 +25,14 @@ class Movie
     private $name;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Character::class, mappedBy="movies")
+     * @ORM\ManyToMany(targetEntity=Character::class, mappedBy="movie")
      */
-    private $character;
+    private $characters;
 
     public function __construct()
     {
         $this->character = new ArrayCollection();
+        $this->characters = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -51,18 +52,22 @@ class Movie
         return $this;
     }
 
+    public function __toString() {
+        return $this->name;
+    }
+
     /**
      * @return Collection|Character[]
      */
-    public function getCharacter(): Collection
+    public function getCharacters(): Collection
     {
-        return $this->character;
+        return $this->characters;
     }
 
     public function addCharacter(Character $character): self
     {
-        if (!$this->character->contains($character)) {
-            $this->character[] = $character;
+        if (!$this->characters->contains($character)) {
+            $this->characters[] = $character;
             $character->addMovie($this);
         }
 
@@ -71,7 +76,7 @@ class Movie
 
     public function removeCharacter(Character $character): self
     {
-        if ($this->character->removeElement($character)) {
+        if ($this->characters->removeElement($character)) {
             $character->removeMovie($this);
         }
 
