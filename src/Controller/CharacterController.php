@@ -185,6 +185,18 @@ class CharacterController extends AbstractController
     }
 
     /**
+     * @Route("/deleteImage/{id}", name="character_deleteimage", requirements={"id"="\d+"})
+     */
+    public function deleteImage(Request $request, $id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $character = $entityManager->getRepository(Character::class)->find($id);
+        $character->setPicture(null);
+        $entityManager->flush();
+        return $this->redirectToRoute('character_show',['id' => $id]);
+    }
+
+    /**
      * @Route("/filter", name="character_filter")
      */
     public function filter(Request $request)
